@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revival</title>
+    <style>
+        :root { --sprites: none; }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: #111;
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* ===== MENU OVERLAY ===== */
+        .menu-overlay {
+            background: #222;
+            border: 4px solid #555;
+            padding: 30px;
+            border-radius: 10px;
+            width: 800px;
+            text-align: center;
+            box-shadow: 0px 0px 20px #000;
+            position: relative;
+        }
+
+        h1 {
+            color: #F55;
+            font-size: 54px;
+            margin-top: 0;
+            text-shadow: 3px 3px 0px #000;
+            letter-spacing: 5px;
+        }
+
+        .menu-section {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            margin-bottom: 20px;
+            padding: 15px;
+            text-align: left;
+        }
+        .menu-section h2 {
+            color: #8F8;
+            margin-top: 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        /* ===== FORM CONTROLS ===== */
+        select, input[type="file"] {
+            background: #000;
+            color: #FFF;
+            border: 2px solid #555;
+            padding: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            margin-right: 10px;
+        }
+
+        button {
+            background: #F55;
+            color: #FFF;
+            border: 2px solid #FFF;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin: 5px;
+        }
+        button:hover { background: #F88; }
+
+        /* ===== NAV BUTTONS ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .nav-buttons button {
+            background: #444;
+            border-color: #888;
+            font-size: 14px;
+        }
+        .nav-buttons button:hover { background: #666; }
+
+        /* ===== COLUMNS ===== */
+        .columns { display: flex; gap: 20px; }
+        .col { flex: 1; }
+        ul { padding-left: 20px; margin: 0; line-height: 1.6; font-size: 14px; }
+        .highlight { color: #FF0; font-weight: bold; }
+
+        /* ===== FULL-SCREEN OVERLAYS (Settings / Glossary) ===== */
+        .full-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #222;
+            border-radius: 10px;
+            padding: 30px;
+            box-sizing: border-box;
+            z-index: 20;
+            text-align: left;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: #F00;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* ===== SETTINGS SLIDERS ===== */
+        .slider-container {
+            margin: 15px 0;
+        }
+        .slider-container label {
+            display: inline-block;
+            width: 150px;
+            font-size: 18px;
+        }
+        input[type=range] { width: 250px; }
+        .slider-value {
+            display: inline;
+            margin-left: 10px;
+            color: #FF0;
+        }
+
+        /* ===== PLAYER COLOR PICKER ===== */
+        .color-picker {
+            display: flex;
+            gap: 6px;
+            margin: 5px 0;
+        }
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #333;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .color-swatch.selected {
+            border-color: white;
+        }
+        .player-color-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+        }
+
+        /* ===== GLOSSARY ===== */
+        .g-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-image: var(--sprites);
+            background-size: 128px 128px;
+            image-rendering: pixelated;
+            margin-right: 8px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            vertical-align: middle;
+        }
+        .glossary-ul {
+            list-style: none;
+            padding: 0;
+        }
+        .glossary-ul li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ===== GAME CONTAINER ===== */
+        #gameContainer {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        canvas {
+            background-color: #000;
+            width: 960px;
+            image-rendering: pixelated;
+            border: 4px solid #555;
+            box-shadow: 0px 0px 20px #000;
+            outline: none;
+        }
+
+        .hud-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #AAA;
+        }
+
+        /* ===== POPUP MENUS (Pause, Game Over, Between Round, Series Summary) ===== */
+        .popup-menu {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            z-index: 10;
+            padding: 20px;
+        }
+
+        /* ===== STATS TABLE (grid layout) ===== */
+        .stats-table {
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto repeat(4, 1fr);
+        }
+        .stats-table .stat-label {
+            text-align: left;
+            padding: 4px;
+            color: #AAA;
+        }
+        .stats-table .stat-value {
+            text-align: center;
+            padding: 4px;
+        }
+
+        /* ===== INIT OVERLAY ===== */
+        #initOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        #initOverlay h1 {
+            color: #FF0;
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        #initOverlay h2 {
+            color: #FFF;
+            font-size: 24px;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== 1. INIT OVERLAY ==================== -->
+    <div id="initOverlay">
+        <h1>REVIVAL ENGINE</h1>
+        <h2>[ CLICK ANYWHERE TO INITIALIZE ]</h2>
+    </div>
+
+    <!-- ==================== 2. MAIN MENU ==================== -->
+    <div id="mainMenu" class="menu-overlay" style="display: none;">
+        <h1>REVIVAL</h1>
+
+        <!-- Nav Buttons -->
+        <div class="nav-buttons">
+            <button onclick="toggleOverlay('settingsMenu')">Settings</button>
+            <button onclick="toggleOverlay('glossaryMenu')">Arsenal Glossary</button>
+        </div>
+
+        <!-- Arena Selection -->
+        <div class="menu-section" style="text-align: center;">
+            <label for="mapSelect" style="font-size: 18px;">Select Arena: </label>
+            <select id="mapSelect" onchange="handleMapSelect()">
+                <option value="RANDOM">-- RANDOM GENERATION --</option>
+                <option value="UPLOAD">-- UPLOAD CUSTOM MAP --</option>
+                <option value="assets/map_CLOCK.png">Clock</option>
+                <option value="assets/map_HOUSE.png">House</option>
+                <option value="assets/map_ICEBERG.png">Iceberg</option>
+                <option value="assets/map_LAHTI.png">Lahti</option>
+                <option value="assets/map_LINE.png">Line</option>
+                <option value="assets/map_LUONTO.png">Luonto</option>
+                <option value="assets/map_MINIWAR.png">Miniwar</option>
+                <option value="assets/map_NATURE.png">Nature</option>
+                <option value="assets/map_PYRAMID.png">Pyramid</option>
+                <option value="assets/map_ROOTS.png">Roots</option>
+                <option value="assets/map_SIMPLE.png">Simple</option>
+                <option value="assets/map_STAR.png">Star</option>
+                <option value="assets/map_STONY.png">Stony</option>
+                <option value="assets/map_SUNNYDAY.png">Sunnyday</option>
+                <option value="assets/map_UNDERSEA.png">Undersea</option>
+            </select>
+
+            <div id="uploadDiv" style="display: none; margin-top: 15px;">
+                <input type="file" id="customMapInput" accept="image/png">
+            </div>
+
+            <br><br>
+
+            <!-- Series Mode -->
+            <label for="seriesMode" style="font-size: 16px;">Series Mode: </label>
+            <select id="seriesMode">
+                <option value="single">Single Duel</option>
+                <option value="bo3">Best of 3</option>
+                <option value="bo5">Best of 5</option>
+                <option value="gauntlet">15-Map Gauntlet</option>
+            </select>
+
+            <br><br>
+
+            <!-- Map Selection Mode -->
+            <label for="mapSelectionMode" style="font-size: 16px;">Map Selection: </label>
+            <select id="mapSelectionMode">
+                <option value="random">Random Each Round</option>
+                <option value="loser">Loser's Pick</option>
+                <option value="playlist">Pre-set Playlist</option>
+            </select>
+
+            <br><br>
+
+            <button onclick="playSound('MENU'); startGame()">Commence Battle</button>
+        </div>
+
+        <!-- Two-Column: Controls + Rules -->
+        <div class="columns">
+            <div class="col menu-section">
+                <h2>CONTROLS</h2>
+                <p><span style="color:#00C3FF; font-weight:bold;">PLAYER 1 (Blue)</span></p>
+                <ul>
+                    <li><strong>Move:</strong> A / D &nbsp;|&nbsp; <strong>Jump:</strong> W &nbsp;|&nbsp; <strong>Fall:</strong> S</li>
+                    <li><strong>Primary:</strong> TAB &nbsp;|&nbsp; <strong>Special:</strong> ~</li>
+                </ul>
+                <p><span style="color:#FF3333; font-weight:bold;">PLAYER 2 (Red)</span></p>
+                <ul>
+                    <li><strong>Move:</strong> Arrows &nbsp;|&nbsp; <strong>Jump:</strong> Up &nbsp;|&nbsp; <strong>Fall:</strong> Down</li>
+                    <li><strong>Primary:</strong> N &nbsp;|&nbsp; <strong>Special:</strong> M</li>
+                </ul>
+            </div>
+
+            <div class="col menu-section">
+                <h2>THE RULES</h2>
+                <ul>
+                    <li><span class="highlight">500 Health.</span> You lose all collected loot when your health drops past the 350 and 150 thresholds!</li>
+                    <li><span class="highlight">Danger Theme:</span> Panic mode music activates if health drops to 30!</li>
+                    <li><span class="highlight">Kill Sheep</span> to regain +25 Health!</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ==================== 3. SETTINGS OVERLAY ==================== -->
+        <div id="settingsMenu" class="full-overlay">
+            <button class="close-btn" onclick="toggleOverlay('settingsMenu')">X</button>
+            <h1 style="font-size: 36px;">SETTINGS</h1>
+
+            <!-- Audio Controls -->
+            <div class="menu-section">
+                <h2>AUDIO CONTROLS</h2>
+                <div class="slider-container">
+                    <label>Music Volume:</label>
+                    <input type="range" id="volMusic" min="0" max="1" step="0.05" value="0.12" oninput="updateVolumes(); this.nextElementSibling.textContent=this.value">
+                    <span class="slider-value">0.12</span>
+                </div>
+                <div class="slider-container">
+                    <label>SFX Volume:</label>
+                    <input type="range" id="volSFX" min="0" max="1" step="0.05" value="0.6" oninput="updateVolumes(); this.nextElementSibling.textContent=this.value">
+                    <span class="slider-value">0.6</span>
+                </div>
+            </div>
+
+            <!-- Game Rules -->
+            <div class="menu-section">
+                <h2>GAME RULES</h2>
+                <div class="slider-container">
+                    <label>Starting Health:</label>
+                    <input type="range" id="healthSlider" min="500" max="1500" step="50" value="500" oninput="this.nextElementSibling.textContent=this.value">
+                    <span class="slider-value">500</span>
+                </div>
+                <div class="slider-container">
+                    <label>Crate Drop Rate:</label>
+                    <input type="range" id="crateSlider" min="150" max="300" step="10" value="300" oninput="this.nextElementSibling.textContent=(300/parseInt(this.value)).toFixed(1)+'x'">
+                    <span class="slider-value">1x</span>
+                </div>
+                <div class="slider-container">
+                    <label>Arena Size:</label>
+                    <input type="range" id="arenaSizeSlider" min="1" max="2" step="0.25" value="1" oninput="this.nextElementSibling.textContent=this.value+'x'">
+                    <span class="slider-value">1x</span>
+                </div>
+            </div>
+
+            <!-- Player Colors -->
+            <div class="menu-section">
+                <h2>PLAYER COLORS</h2>
+                <div style="margin-bottom: 15px;">
+                    <label for="playerCount" style="font-size: 16px;">Players: </label>
+                    <select id="playerCount">
+                        <option value="2">2 Players</option>
+                        <option value="3">3 Players</option>
+                        <option value="4">4 Players</option>
+                    </select>
+                </div>
+
+                <!-- Player 1 -->
+                <div class="player-color-row" data-player="1">
+                    <label style="width: 80px;">Player 1:</label>
+                    <div class="color-picker">
+                        <div class="color-swatch selected" style="background:#00C3FF;" data-color="#00C3FF"></div>
+                        <div class="color-swatch" style="background:#FF3333;" data-color="#FF3333"></div>
+                        <div class="color-swatch" style="background:#FFD700;" data-color="#FFD700"></div>
+                        <div class="color-swatch" style="background:#FF00FF;" data-color="#FF00FF"></div>
+                        <div class="color-swatch" style="background:#00FF88;" data-color="#00FF88"></div>
+                        <div class="color-swatch" style="background:#FF8800;" data-color="#FF8800"></div>
+                        <div class="color-swatch" style="background:#FFFFFF;" data-color="#FFFFFF"></div>
+                        <div class="color-swatch" style="background:#AA44FF;" data-color="#AA44FF"></div>
+                    </div>
+                </div>
+
+                <!-- Player 2 -->
+                <div class="player-color-row" data-player="2">
+                    <label style="width: 80px;">Player 2:</label>
+                    <div class="color-picker">
+                        <div class="color-swatch" style="background:#00C3FF;" data-color="#00C3FF"></div>
+                        <div class="color-swatch selected" style="background:#FF3333;" data-color="#FF3333"></div>
+                        <div class="color-swatch" style="background:#FFD700;" data-color="#FFD700"></div>
+                        <div class="color-swatch" style="background:#FF00FF;" data-color="#FF00FF"></div>
+                        <div class="color-swatch" style="background:#00FF88;" data-color="#00FF88"></div>
+                        <div class="color-swatch" style="background:#FF8800;" data-color="#FF8800"></div>
+                        <div class="color-swatch" style="background:#FFFFFF;" data-color="#FFFFFF"></div>
+                        <div class="color-swatch" style="background:#AA44FF;" data-color="#AA44FF"></div>
+                    </div>
+                </div>
+
+                <!-- Player 3 -->
+                <div class="player-color-row" data-player="3">
+                    <label style="width: 80px;">Player 3:</label>
+                    <div class="color-picker">
+                        <div class="color-swatch" style="background:#00C3FF;" data-color="#00C3FF"></div>
+                        <div class="color-swatch" style="background:#FF3333;" data-color="#FF3333"></div>
+                        <div class="color-swatch selected" style="background:#FFD700;" data-color="#FFD700"></div>
+                        <div class="color-swatch" style="background:#FF00FF;" data-color="#FF00FF"></div>
+                        <div class="color-swatch" style="background:#00FF88;" data-color="#00FF88"></div>
+                        <div class="color-swatch" style="background:#FF8800;" data-color="#FF8800"></div>
+                        <div class="color-swatch" style="background:#FFFFFF;" data-color="#FFFFFF"></div>
+                        <div class="color-swatch" style="background:#AA44FF;" data-color="#AA44FF"></div>
+                    </div>
+                </div>
+
+                <!-- Player 4 -->
+                <div class="player-color-row" data-player="4">
+                    <label style="width: 80px;">Player 4:</label>
+                    <div class="color-picker">
+                        <div class="color-swatch" style="background:#00C3FF;" data-color="#00C3FF"></div>
+                        <div class="color-swatch" style="background:#FF3333;" data-color="#FF3333"></div>
+                        <div class="color-swatch" style="background:#FFD700;" data-color="#FFD700"></div>
+                        <div class="color-swatch selected" style="background:#FF00FF;" data-color="#FF00FF"></div>
+                        <div class="color-swatch" style="background:#00FF88;" data-color="#00FF88"></div>
+                        <div class="color-swatch" style="background:#FF8800;" data-color="#FF8800"></div>
+                        <div class="color-swatch" style="background:#FFFFFF;" data-color="#FFFFFF"></div>
+                        <div class="color-swatch" style="background:#AA44FF;" data-color="#AA44FF"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 4. GLOSSARY OVERLAY ==================== -->
+        <div id="glossaryMenu" class="full-overlay">
+            <button class="close-btn" onclick="toggleOverlay('glossaryMenu')">X</button>
+            <h1 style="font-size: 36px;">ARSENAL GLOSSARY</h1>
+            <div class="columns">
+                <div class="col">
+                    <!-- Explosives & Guns -->
+                    <h3 style="color:#F55;">Explosives &amp; Guns</h3>
+                    <ul class="glossary-ul">
+                        <li><span class="g-icon" style="background-position: 0px 0px;"></span><div><strong>Shotgun:</strong> Close-range 3-pellet burst.</div></li>
+                        <li><span class="g-icon" style="background-position: -16px 0px;"></span><div><strong>Bazooka:</strong> Massive cratering explosion.</div></li>
+                        <li><span class="g-icon" style="background-position: -32px 0px;"></span><div><strong>Grenade:</strong> Arcing explosive with terrain damage.</div></li>
+                        <li><span class="g-icon" style="background-position: -48px 0px;"></span><div><strong>Minigun:</strong> Rapid-fire stream of bullets.</div></li>
+                        <li><span class="g-icon" style="background-position: -64px 0px;"></span><div><strong>Spreadfire:</strong> Short-range cone of flame pellets.</div></li>
+                        <li><span class="g-icon" style="background-position: -80px 0px;"></span><div><strong>Homing Missile:</strong> Seeks nearest enemy automatically.</div></li>
+                        <li><span class="g-icon" style="background-position: -112px 0px;"></span><div><strong>Cluster Bomb:</strong> Air-bursts into 5 bomblets.</div></li>
+                    </ul>
+
+                    <!-- Magic & Powers -->
+                    <h3 style="color:#0FF;">Magic &amp; Powers</h3>
+                    <ul class="glossary-ul">
+                        <li><span class="g-icon" style="background-position: -64px -48px;"></span><div><strong>Voodoo:</strong> Reflects all damage taken for 10s.</div></li>
+                        <li><span class="g-icon" style="background-position: -80px -48px;"></span><div><strong>Cloaker:</strong> Turn into a single pixel to hide.</div></li>
+                        <li><span class="g-icon" style="background-position: -80px -16px;"></span><div><strong>Freezer:</strong> Stops enemies mid-air in a 25px radius.</div></li>
+                        <li><span class="g-icon" style="background-position: -16px -48px;"></span><div><strong>Teleport:</strong> Safe-drop to a random surface.</div></li>
+                        <li><span class="g-icon" style="background-position: 0px -48px;"></span><div><strong>Steal:</strong> Randomly rips 3 items from enemy inventory.</div></li>
+                        <li><span class="g-icon" style="background-position: -96px -32px;"></span><div><strong>Heal:</strong> Restores a chunk of lost health.</div></li>
+                        <li><span class="g-icon" style="background-position: -32px -48px;"></span><div><strong>Mega Speed:</strong> Doubles movement speed temporarily.</div></li>
+                        <li><span class="g-icon" style="background-position: -48px -48px;"></span><div><strong>Mega Jump:</strong> Doubles jump height temporarily.</div></li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <!-- Tech & Events -->
+                    <h3 style="color:#FF0;">Tech &amp; Events</h3>
+                    <ul class="glossary-ul">
+                        <li><span class="g-icon" style="background-position: -32px -16px;"></span><div><strong>Airstrike:</strong> 25 bombs blanket the enemy's half.</div></li>
+                        <li><span class="g-icon" style="background-position: -64px -16px;"></span><div><strong>Lightning:</strong> Seeks out players not under cover.</div></li>
+                        <li><span class="g-icon" style="background-position: -48px -16px;"></span><div><strong>Boulder:</strong> Rolling rock that crushes everything.</div></li>
+                        <li><span class="g-icon" style="background-position: 0px -32px;"></span><div><strong>Missile Tower:</strong> Auto-turret that guards an area.</div></li>
+                        <li><span class="g-icon" style="background-position: -16px -32px;"></span><div><strong>Plasma Wall:</strong> Creeping shield that dissolves over 6s.</div></li>
+                        <li><span class="g-icon" style="background-position: -112px -32px;"></span><div><strong>Superbridge:</strong> Constructs a solid platform bridge.</div></li>
+                        <li><span class="g-icon" style="background-position: -96px -48px;"></span><div><strong>Rear Turret:</strong> Backward-firing auto cannon.</div></li>
+                        <li><span class="g-icon" style="background-position: -96px -16px;"></span><div><strong>Mine:</strong> Invisible pressure-triggered explosive.</div></li>
+                        <li><span class="g-icon" style="background-position: -112px -16px;"></span><div><strong>Fake Crate:</strong> Decoy crate that explodes on pickup.</div></li>
+                    </ul>
+
+                    <!-- Biology -->
+                    <h3 style="color:#0F0;">Biology</h3>
+                    <ul class="glossary-ul">
+                        <li><span class="g-icon" style="background-position: -16px -16px;"></span><div><strong>Toxic Gas:</strong> Persistent 40-damage poison cloud.</div></li>
+                        <li><span class="g-icon" style="background-position: -32px -32px;"></span><div><strong>Sheep:</strong> Wanders around. Kill for +25 HP.</div></li>
+                        <li><span class="g-icon" style="background-position: -48px -32px;"></span><div><strong>Ants:</strong> Tiny explosive homing drones.</div></li>
+                        <li><span class="g-icon" style="background-position: -64px -32px;"></span><div><strong>Holotrooper:</strong> A decoy that fires fake lasers.</div></li>
+                        <li><span class="g-icon" style="background-position: -80px -32px;"></span><div><strong>Ghost:</strong> Ethereal entity that haunts enemies.</div></li>
+                        <li><span class="g-icon" style="background-position: -96px 0px;"></span><div><strong>Boomerang:</strong> Returns after hitting terrain or foe.</div></li>
+                        <li><span class="g-icon" style="background-position: 0px -16px;"></span><div><strong>Laser:</strong> Instant screen-wide raycast burn.</div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end mainMenu -->
+
+    <!-- ==================== 5. GAME CONTAINER ==================== -->
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="320" height="200" tabindex="0"></canvas>
+        <div class="hud-text">P1: WASD/TAB/~ &nbsp;&nbsp;|&nbsp;&nbsp; P2: ARROWS/N/M &nbsp;&nbsp;|&nbsp;&nbsp; ESC to Pause</div>
+
+        <!-- Pause Menu -->
+        <div id="pauseMenu" class="menu-overlay popup-menu">
+            <h1 style="font-size: 36px; color: #FFF;">PAUSED</h1>
+            <button onclick="playSound('MENU'); resumeGame()">Resume</button>
+            <button onclick="playSound('MENU'); playAgain()">Restart Level</button>
+            <button onclick="playSound('MENU'); goToMainMenu()">Main Menu</button>
+        </div>
+
+        <!-- Game Over Menu -->
+        <div id="gameOverMenu" class="menu-overlay popup-menu">
+            <h1 id="winnerText" style="font-size: 36px;">PLAYER WINS!</h1>
+            <button onclick="playSound('MENU'); playAgain()">Play Again</button>
+            <button onclick="playSound('MENU'); goToMainMenu()">Main Menu</button>
+        </div>
+
+        <!-- Between-Round Summary -->
+        <div id="betweenRoundMenu" class="menu-overlay popup-menu" style="width: 500px;">
+            <h1 style="font-size: 30px; color: #FF0;">ROUND COMPLETE</h1>
+            <p id="roundResultText" style="font-size: 20px; text-align: center;"></p>
+            <p id="seriesScoreText" style="font-size: 18px; text-align: center; color: #8F8;"></p>
+            <div id="betweenRoundStats" class="stats-table"></div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button onclick="playSound('MENU'); nextRound()">Next Round</button>
+            </div>
+        </div>
+
+        <!-- Final Series Summary -->
+        <div id="seriesSummaryMenu" class="menu-overlay popup-menu" style="width: 550px;">
+            <h1 style="font-size: 30px; color: #FF0;">SERIES COMPLETE</h1>
+            <p id="championText" style="font-size: 22px; text-align: center; color: #F55;"></p>
+            <div id="finalStats" class="stats-table"></div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button onclick="playSound('MENU'); goToMainMenu()">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+<script>

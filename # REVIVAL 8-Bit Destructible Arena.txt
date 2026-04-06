@@ -1,0 +1,58 @@
+# REVIVAL: 8-Bit Destructible Arena Brawler
+
+**Revival** is a fully procedural, zero-dependency, 8-bit local multiplayer combat game. Built entirely within a single HTML5 file, it requires no external image or audio uploads to run (aside from custom map layouts). The engine generates its own pixel art, synthesizes its own chiptune soundtrack, and calculates pixel-perfect destructible terrain in real-time.
+
+## 🚀 Core Features
+
+### 1. Procedural Engine
+* **Zero-Asset Generation:** All 32 weapon icons and the animated Space Marine sprites (Red & Blue) are mathematically generated onto a virtual sprite sheet via HTML5 Canvas the moment the game boots.
+* **Web Audio API Synthesizer:** All sound effects (explosions, lasers, jumping, hurt grunts) and music are generated live using oscillators and noise buffers.
+* **Dynamic Soundtrack:** Features 5 distinct 8-bit tracks. The music reacts to gameplay—if a player drops to 30 HP, the music hard-cuts to a 160BPM "Danger" theme.
+
+### 2. Advanced Combat & Physics
+* **Pixel-Perfect Destruction:** Every explosion mathematically carves out the terrain. 
+* **Movement Mechanics:** Features gravity, recoil, variable jump heights, fast-falling, and momentum tracking.
+* **Fall Damage:** Taking a massive plunge penalizes player health based on distance fallen.
+* **Dynamic Loot System:** Players start with 500 HP. Passing the 350 and 150 HP thresholds (downwards) violently strips the player of all collected inventory, creating massive momentum swings.
+
+### 3. Massive Arsenal (32 Items)
+Players collect crates to arm themselves with uniquely programmed weapons and abilities:
+* **Guns & Explosives:** Shotgun, Bazooka, Homing Missiles, Cluster Bombs, Boomerang, Screen-wide Lasers.
+* **Magic & Powers:** Voodoo (damage reflection), Cloaker, Freezer, Teleport, Item Steal.
+* **Tech & Traps:** Airstrikes, Seeking Lightning, Missile Towers, Plasma Walls, Landmines, Fake Crates.
+* **Biology:** Toxic Gas, Explosive Ants, Holotrooper Decoys, Ghosts, and Sheep (kill for +25 HP).
+
+### 4. Tournament Meta-Game
+* **Match Types:** Single Duel, Best of 3, Best of 5, or the massive 15-Map Gauntlet.
+* **Map Rules:** Pure Random, Loser's Pick, or a Pre-set Custom Playlist.
+* **Stat Tracking:** The engine secretly tracks Total Damage, Damage to Self, Accuracy, Kill Count, Distance Traveled, Crates Collected, and Sheep Massacred, displaying them on a cinematic end-of-match overlay.
+
+### 5. Arena Generation
+* **Core Maps:** 15 pre-designed battlegrounds.
+* **Procedural Random Maps:** Generates unique rolling hills and floating islands using noise algorithms.
+* **Custom Map Uploads:** Players can upload any `.png` file. The engine calculates the area and dynamically scales massive images down to maintain 8-bit pacing and playability.
+
+## 🎮 Controls
+
+**Player 1 (Blue Marine)**
+* Move: `A` / `D`
+* Jump: `W`
+* Fast Fall: `S`
+* Primary Fire (Rifle): `TAB`
+* Special (Inventory): `~` (Tilde)
+* Cycle Inventory: `S` (While on ground)
+
+**Player 2 (Red Marine)**
+* Move: `Left` / `Right Arrows`
+* Jump: `Up Arrow`
+* Fast Fall: `Down Arrow`
+* Primary Fire (Rifle): `N`
+* Special (Inventory): `M`
+* Cycle Inventory: `Down Arrow` (While on ground)
+
+## 🛠️ How to Run
+Due to browser CORS security policies regarding the loading of local `.png` map files, simply double-clicking the `index.html` file may result in a black screen for standard maps. 
+**To play:**
+1. Open the folder in **VS Code** and use the **Live Server** extension.
+2. OR upload the `.zip` containing the `index.html` and `assets/` folder to a web host like **Itch.io**.
+*(Note: "Random Map" and "Upload Map" bypass this security and work anywhere!)*

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revival - Ultimate Soundboard</title>
+    <style>
+        body { background-color: #111; color: white; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
+        h1 { color: #0FF; text-shadow: 2px 2px 0px #000; font-size: 40px; margin-bottom: 10px; }
+        p.subtitle { color: #AAA; margin-bottom: 30px; text-align: center; max-width: 600px; }
+        
+        .section-title { width: 100%; border-bottom: 2px solid #333; color: #FF0; margin-top: 30px; padding-bottom: 5px; font-size: 24px; text-transform: uppercase; }
+        
+        .grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; max-width: 900px; margin-top: 20px; }
+        
+        .card { 
+            background: #222; border: 2px solid #555; border-radius: 8px; width: 100px; height: 110px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.1s; box-shadow: 0px 4px 0px #000;
+        }
+        .card:hover { background: #333; border-color: #FFF; transform: translateY(-2px); box-shadow: 0px 6px 0px #000; }
+        .card:active { background: #0FF; transform: translateY(4px); box-shadow: 0px 0px 0px #000; }
+        .card:active span { color: #000; font-weight: bold; }
+        
+        .sprite-icon { width: 32px; height: 32px; image-rendering: pixelated; margin-bottom: 10px; }
+        span { font-size: 12px; text-align: center; line-height: 1.2; padding: 0 5px; }
+
+        .basic-btn { background: #444; color: #FFF; border: 2px solid #888; padding: 15px 20px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 5px; font-family: inherit; box-shadow: 0px 4px 0px #000; }
+        .basic-btn:hover { background: #666; border-color: #FFF; }
+        .basic-btn:active { transform: translateY(4px); box-shadow: 0px 0px 0px #000; background: #FF0; color: #000; }
+    </style>
+</head>
+<body>
+
+    <h1>WEAPON AUDIO FORGE</h1>
+    <p class="subtitle">Click any item to test its synthesized 8-bit sound profile. Updated with new physics, alarms, and 90s grunts!</p>
+
+    <div id="appContainer"></div>
+
+<script>
+    // --- 1. SPRITE GENERATOR ---
+    const sc = document.createElement('canvas');
+    sc.width = 64; sc.height = 32; 
+    const sx = sc.getContext('2d');
+    
+    const p = {
+        'w':'#FFF', 'k':'#000', 'g':'#555', 'l':'#AAA', 'r':'#F00', 'R':'#A00', 'y':'#FF0', 'Y':'#A80',
+        'G':'#0F0', 'd':'#0A0', 'c':'#0FF', 'C':'#0AA', 'b':'#00F', 'B':'#55F', 'm':'#F0F', 'M':'#A0A', 't':'#8B4513'
+    };
+
+    function drawArt(gx, gy, lines) {
+        for(let row=0; row<8; row++) {
+            for(let col=0; col<8; col++) {
+                let char = lines[row] ? lines[row][col] : ' ';
+                if(p[char]) { sx.fillStyle = p[char]; sx.fillRect(gx*8+col, gy*8+row, 1, 1); }
+            }
+        }
+    }
+
+    drawArt(0,0, ["        ","        "," ggggg  "," llllkg "," l   k  ","        ","        ","        "]); 
+    drawArt(1,0, ["        ","   g    "," dddddk "," dddddk ","   g    ","        ","        ","        "]); 
+    drawArt(2,0, ["   l    ","  lRl   ","  ddd   "," ddddd  "," ddddd  ","  ddd   ","        ","        "]); 
+    drawArt(3,0, ["        "," ggg    "," kllkg  "," klllg  ","  ll    ","        ","        ","        "]); 
+    drawArt(4,0, ["        ","    y   "," gglly  "," glly   "," gglly  ","    y   ","        ","        "]); 
+    drawArt(5,0, ["        ","   rr   "," yyRrr  "," yyRrr  ","   rr   ","        ","        ","        "]); 
+    drawArt(6,0, ["        ","   ccc  ","  c   c ","  c   c ","  c     ","  c     ","        ","        "]); 
+    drawArt(7,0, ["        ","   Yy   ","  YyYy  ","  YyYy  ","   Yy   ","        ","        ","        "]); 
+    drawArt(0,1, ["        ","        "," mmc    "," mm ccc "," m c    ","        ","        ","        "]); 
+    drawArt(1,1, ["        ","   Gd   ","  dGdG  "," GdGGd  ","  dGd   ","   d    ","        ","        "]); 
+    drawArt(2,1, ["   y    ","  rrr   ","  rrr   "," rrrrr  "," rrrrr  ","  l l   ","        ","        "]); 
+    drawArt(3,1, ["  llll  "," lgllgl "," lglgll "," lllllg "," lgglll ","  llll  ","        ","        "]); 
+    drawArt(4,1, ["   y    ","  yy    ","  yyy   ","   yyy  ","   yy   ","  yy    ","  y     ","        "]); 
+    drawArt(5,1, ["   c    "," c c c  ","  ccc   "," ccccc  ","  ccc   "," c c c  ","   c    ","        "]); 
+    drawArt(6,1, ["        ","        ","        ","   r    ","  ggg   "," ggggg  "," kkkkkk ","        "]); 
+    drawArt(7,1, ["        "," ttttt  "," t w t  "," t w t  "," t   t  "," t w t  "," ttttt  ","        "]); 
+    drawArt(0,2, ["  rr    ","  ggll  ","  gg    ","  gg    ","  gg    ","  gg    "," gggg   ","        "]); 
+    drawArt(1,2, ["   c    ","  CcC   ","  CcC   ","  CcC   ","  CcC   ","  CcC   ","   c    ","        "]); 
+    drawArt(2,2, ["        ","  www   "," wwwww  "," kwwwk  ","  www   ","  k k   ","        ","        "]); 
+    drawArt(3,2, ["        ","        "," k r k  ","  rrr   "," k r k  ","        ","        ","        "]); 
+    drawArt(4,2, ["   B    ","  BBB   "," B B B  ","   B    ","  B B   ","  B B   ","        ","        "]); 
+    drawArt(5,2, ["  www   "," wwwwk  "," wwww   "," wwww   "," w w w  ","        ","        ","        "]); 
+    drawArt(6,2, ["        ","   G    ","   G    "," GGGGG  ","   G    ","   G    ","        ","        "]); 
+    drawArt(7,2, ["        ","        ","        ","  cccc  "," ccccc  "," ccccc  ","        ","        "]); 
+    drawArt(0,3, ["   M    ","  M M   ","  M M   ","  M M   ","  M M   ","  k k   ","        ","        "]); 
+    drawArt(1,3, ["   bb   ","  b  b  ","  b b   ","   bb   ","        ","  CbbC  "," CbbbbC ","        "]); 
+    drawArt(2,3, ["        ","   mm   ","   mm   "," mmmm   "," mmmm   "," mmmmm  "," mmmmm  ","        "]); 
+    drawArt(3,3, ["   M    ","  MMM   "," M M M  ","   M    ","  MMM   "," M M M  ","        ","        "]); 
+    drawArt(4,3, ["  RRR   "," RkRkR  "," RRRRR  ","  R R   ","        ","  ww    ","  ww    ","        "]); 
+    drawArt(5,3, ["   g    ","  g g   "," g   g  ","   g    ","  g g   ","  g g   ","        ","        "]); 
+    drawArt(6,3, ["        ","   gg   "," llgg   ","   gg   ","        ","        ","        ","        "]); 
+    drawArt(7,3, ["        ","        ","   llll ","   lg   ","   l    ","        ","        ","        "]); 
+
+    const spriteUrl = sc.toDataURL();
+
+    // --- 2. WEAPON DATA MAP ---
+    const WEAPON_DEFS = [
+        { cat: 'Guns & Explosives', list: [
+            { id: 'RIFLE', name: 'Starter Rifle', sx: 56, sy: 24 },
+            { id: 'SHOTGUN', name: 'Shotgun', sx: 0, sy: 0 },
+            { id: 'MINIGUN', name: 'Minigun', sx: 24, sy: 0 },
+            { id: 'SPREADFIRE', name: 'Spreadfire', sx: 32, sy: 0 },
+            { id: 'BAZOOKA', name: 'Bazooka', sx: 8, sy: 0 },
+            { id: 'GRENADE', name: 'Grenade', sx: 16, sy: 0 },
+            { id: 'HOMING', name: 'Homing Missile', sx: 40, sy: 0 },
+            { id: 'CLUSTER', name: 'Cluster Bomb', sx: 56, sy: 0 },
+            { id: 'BOOMERANG', name: 'Boomerang', sx: 48, sy: 0 },
+            { id: 'LASER', name: 'Solid Laser', sx: 0, sy: 8 }
+        ]},
+        { cat: 'Powers & Magic', list: [
+            { id: 'TELEPORT', name: 'Teleport', sx: 8, sy: 24 },
+            { id: 'HEAL', name: 'Heal', sx: 48, sy: 16 },
+            { id: 'MEGA_JUMP', name: 'Mega Jump', sx: 24, sy: 24 },
+            { id: 'MEGA_SPEED', name: 'Mega Speed', sx: 16, sy: 24 },
+            { id: 'STEAL', name: 'Steal', sx: 0, sy: 24 },
+            { id: 'VOODOO', name: 'Voodoo', sx: 32, sy: 24 },
+            { id: 'CLOAKER', name: 'Cloaker', sx: 40, sy: 24 },
+            { id: 'FREEZER', name: 'Freezer', sx: 40, sy: 8 }
+        ]},
+        { cat: 'Traps, Tech & Events', list: [
+            { id: 'AIRSTRIKE', name: 'Airstrike', sx: 16, sy: 8 },
+            { id: 'LIGHTNING', name: 'Lightning', sx: 32, sy: 8 },
+            { id: 'BOULDER', name: 'Rolling Boulder', sx: 24, sy: 8 },
+            { id: 'MINE', name: 'Land Mine', sx: 48, sy: 8 },
+            { id: 'FAKE', name: 'Fake Crate', sx: 56, sy: 8 },
+            { id: 'TOWER', name: 'Missile Tower', sx: 0, sy: 16 },
+            { id: 'REAR_TURRET', name: 'Rear Turret', sx: 48, sy: 24 },
+            { id: 'PLASMA', name: 'Plasma Wall', sx: 8, sy: 16 },
+            { id: 'SUPERBRIDGE', name: 'Superbridge', sx: 56, sy: 16 }
+        ]},
+        { cat: 'Creatures & Bio', list: [
+            { id: 'SHEEP', name: 'Sheep', sx: 16, sy: 16 },
+            { id: 'ANT', name: 'Ants', sx: 24, sy: 16 },
+            { id: 'HOLOTROOPER', name: 'Holotrooper', sx: 32, sy: 16 },
+            { id: 'GHOST', name: 'Ghost', sx: 40, sy: 16 },
+            { id: 'TOXIC_FART', name: 'Toxic Fart', sx: 8, sy: 8 }
+        ]}
+    ];
+
+    // --- 3. UI GENERATOR ---
+    const app = document.getElementById('appContainer');
+    
+    WEAPON_DEFS.forEach(category => {
+        let title = document.createElement('div');
+        title.className = 'section-title';
+        title.innerText = category.cat;
+        app.appendChild(title);
+
+        let grid = document.createElement('div');
+        grid.className = 'grid';
+
+        category.list.forEach(w => {
+            let btn = document.createElement('div');
+            btn.className = 'card';
+            btn.onclick = () => playSound(w.id);
+
+            let icon = document.createElement('div');
+            icon.className = 'sprite-icon';
+            icon.style.backgroundImage = `url(${spriteUrl})`;
+            icon.style.backgroundSize = '256px 128px'; 
+            icon.style.backgroundPosition = `-${w.sx * 4}px -${w.sy * 4}px`;
+
+            let label = document.createElement('span');
+            label.innerText = w.name;
+
+            btn.appendChild(icon);
+            btn.appendChild(label);
+            grid.appendChild(btn);
+        });
+        app.appendChild(grid);
+    });
+
+    let basicTitle = document.createElement('div');
+    basicTitle.className = 'section-title';
+    basicTitle.innerText = "Basic Game Effects";
+    app.appendChild(basicTitle);
+
+    let basicGrid = document.createElement('div');
+    basicGrid.className = 'grid';
+    basicGrid.innerHTML = `
+        <button class="basic-btn" onclick="playSound('JUMP')">🔼 Jump</button>
+        <button class="basic-btn" onclick="playSound('PICKUP')">🎁 Crate Pickup</button>
+        <button class="basic-btn" onclick="playSound('HURT')">💢 Player Hurt</button>
+        <button class="basic-btn" onclick="playSound('DEATH')">☠️ Game Over</button>
+        <button class="basic-btn" onclick="playSound('MENU')">📋 Menu Select</button>
+    `;
+    app.appendChild(basicGrid);
+
+
+    // --- 4. AUDIO SYNTHESIZER ENGINE ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const ctxA = new AudioContext();
+
+    function playTone(type, freqStart, freqEnd, duration, volStart=0.3) {
+        if (ctxA.state === 'suspended') ctxA.resume();
+        const osc = ctxA.createOscillator();
+        const gain = ctxA.createGain();
+        osc.type = type;
+        osc.connect(gain); gain.connect(ctxA.destination);
+        osc.frequency.setValueAtTime(freqStart, ctxA.currentTime);
+        if (freqEnd !== freqStart) osc.frequency.exponentialRampToValueAtTime(freqEnd, ctxA.currentTime + duration);
+        gain.gain.setValueAtTime(volStart, ctxA.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctxA.currentTime + duration);
+        osc.start(); osc.stop(ctxA.currentTime + duration);
+    }
+
+    function playNoise(duration, lowpassFreq, vol=0.5) {
+        if (ctxA.state === 'suspended') ctxA.resume();
+        const bufferSize = ctxA.sampleRate * duration;
+        const buffer = ctxA.createBuffer(1, bufferSize, ctxA.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        
+        const noise = ctxA.createBufferSource();
+        noise.buffer = buffer;
+        const filter = ctxA.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(lowpassFreq, ctxA.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(100, ctxA.currentTime + duration);
+
+        const gain = ctxA.createGain();
+        gain.gain.setValueAtTime(vol, ctxA.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctxA.currentTime + duration);
+        
+        noise.connect(filter); filter.connect(gain); gain.connect(ctxA.destination);
+        noise.start();
+    }
+
+    function playArp(type, freqs, durationPerNote, vol=0.2) {
+        if (ctxA.state === 'suspended') ctxA.resume();
+        const osc = ctxA.createOscillator();
+        const gain = ctxA.createGain();
+        osc.type = type;
+        osc.connect(gain); gain.connect(ctxA.destination);
+        
+        let time = ctxA.currentTime;
+        freqs.forEach(f => {
+            osc.frequency.setValueAtTime(f, time);
+            time += durationPerNote;
+        });
+        
+        gain.gain.setValueAtTime(vol, ctxA.currentTime);
+        gain.gain.setValueAtTime(vol, ctxA.currentTime + (freqs.length * durationPerNote) - 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctxA.currentTime + (freqs.length * durationPerNote));
+        
+        osc.start(); osc.stop(time);
+    }
+
+    function playSound(id) {
+        switch(id) {
+            // === GUNS ===
+            case 'RIFLE': playTone('square', 600, 150, 0.15, 0.2); break;
+            case 'SHOTGUN': playNoise(0.2, 500, 0.6); playTone('square', 200, 50, 0.2, 0.3); break;
+            case 'MINIGUN': 
+                playTone('square', 800, 400, 0.05, 0.1); 
+                setTimeout(()=>playTone('square', 800, 400, 0.05, 0.1), 50);
+                setTimeout(()=>playTone('square', 800, 400, 0.05, 0.1), 100);
+                break;
+            case 'SPREADFIRE': playTone('sawtooth', 500, 100, 0.2, 0.3); playTone('square', 400, 80, 0.2, 0.2); break;
+            case 'BAZOOKA': playTone('sine', 400, 50, 0.4, 0.5); setTimeout(()=>playNoise(0.5, 800, 0.8), 200); break;
+            case 'GRENADE': playTone('triangle', 300, 600, 0.2, 0.3); setTimeout(()=>playNoise(0.3, 1000, 0.6), 400); break;
+            case 'HOMING': playTone('sawtooth', 150, 400, 0.8, 0.2); break;
+            case 'CLUSTER': playTone('square', 800, 200, 0.3, 0.3); setTimeout(()=>{playNoise(0.2,800,0.5); setTimeout(()=>playNoise(0.1,600,0.4),100); setTimeout(()=>playNoise(0.1,600,0.4),200);}, 400); break;
+            
+            // UPDATED: Heavy, sustaining synth hum for solid laser
+            case 'LASER': 
+                playTone('sawtooth', 120, 80, 0.6, 0.4); 
+                playTone('square', 60, 40, 0.6, 0.3); 
+                break;
+                
+            // UPDATED: Rhythmic helicopter womp-womp loop
+            case 'BOOMERANG': 
+                for(let i=0; i<8; i++) { setTimeout(()=>playTone('triangle', 150, 100, 0.08, 0.4), i*80); }
+                break;
+
+            // === EVENTS / TRAPS ===
+            case 'TOXIC_FART': playNoise(1.5, 300, 0.5); playTone('sawtooth', 60, 20, 1.5, 0.4); break;
+            case 'BOULDER': playNoise(2.0, 150, 0.7); break;
+            case 'FREEZER': playArp('sine', [800, 1200, 1600, 2400, 3200], 0.08, 0.3); break;
+            case 'MINE': playTone('sine', 1200, 1200, 0.1, 0.4); setTimeout(()=>playNoise(0.4, 1000, 0.7), 200); break;
+            case 'FAKE': playTone('square', 200, 100, 0.1, 0.4); setTimeout(()=>playNoise(0.4, 1000, 0.7), 200); break;
+            case 'TOWER': playTone('square', 100, 50, 0.2, 0.5); playNoise(0.1, 400, 0.3); break;
+            case 'PLASMA': playTone('sawtooth', 100, 80, 1.0, 0.2); break;
+
+            // UPDATED: Airstrike Warning Siren
+            case 'AIRSTRIKE': 
+                if (ctxA.state === 'suspended') ctxA.resume();
+                const osc = ctxA.createOscillator();
+                const gain = ctxA.createGain();
+                osc.type = 'sawtooth';
+                osc.connect(gain); gain.connect(ctxA.destination);
+                osc.frequency.setValueAtTime(300, ctxA.currentTime);
+                osc.frequency.linearRampToValueAtTime(700, ctxA.currentTime + 0.6);
+                osc.frequency.linearRampToValueAtTime(300, ctxA.currentTime + 1.2);
+                osc.frequency.linearRampToValueAtTime(700, ctxA.currentTime + 1.8);
+                gain.gain.setValueAtTime(0.2, ctxA.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, ctxA.currentTime + 1.8);
+                osc.start(); osc.stop(ctxA.currentTime + 1.8);
+                setTimeout(() => playNoise(1.2, 1000, 1.0), 1800); 
+                break;
+
+            // UPDATED: Sharp, erratic crackling lightning
+            case 'LIGHTNING': 
+                playNoise(0.05, 5000, 1.0);
+                setTimeout(()=>playNoise(0.03, 6000, 0.9), 70);
+                setTimeout(()=>playTone('sawtooth', 3000, 1500, 0.05, 0.4), 100);
+                setTimeout(()=>playNoise(0.08, 4000, 0.8), 160);
+                setTimeout(()=>playTone('square', 2000, 800, 0.05, 0.3), 200);
+                setTimeout(()=>playNoise(0.1, 7000, 0.9), 250);
+                break;
+
+            // === CREATURES ===
+            case 'SHEEP': playTone('triangle', 500, 300, 0.3, 0.3); setTimeout(()=>playTone('triangle', 300, 200, 0.2, 0.3), 150); break;
+            case 'ANT': playArp('square', [1200, 0, 1400, 0, 1600], 0.03, 0.1); break;
+            case 'HOLOTROOPER': playArp('square', [300, 400, 500, 600, 800], 0.05, 0.2); break;
+            case 'GHOST': playTone('sine', 400, 800, 0.5, 0.3); setTimeout(()=>playTone('sine', 800, 400, 0.5, 0.3), 450); break;
+
+            // === POWERS ===
+            case 'HEAL': playArp('sine', [400, 500, 600, 800], 0.1, 0.3); break;
+            case 'SUPERBRIDGE': playArp('square', [200, 300, 400, 500, 600, 700], 0.05, 0.2); break;
+            case 'STEAL': playTone('square', 300, 900, 0.2, 0.3); break;
+            case 'MEGA_SPEED': playTone('sawtooth', 100, 600, 0.6, 0.3); break;
+            case 'MEGA_JUMP': playTone('sine', 200, 1200, 0.4, 0.4); break;
+            case 'VOODOO': playTone('sine', 300, 300, 0.8, 0.4); playTone('sine', 320, 320, 0.8, 0.4); break; 
+            case 'CLOAKER': playNoise(1.0, 800, 0.3); playTone('sine', 800, 100, 1.0, 0.3); break;
+            case 'REAR_TURRET': playTone('square', 400, 200, 0.1, 0.3); setTimeout(()=>playTone('square', 400, 200, 0.1, 0.3), 100); break;
+
+            // UPDATED: "Sinking in" drop, pause, then "Popping out" upward blip
+            case 'TELEPORT': 
+                playTone('sine', 400, 50, 0.3, 0.3); 
+                setTimeout(() => playTone('sine', 100, 800, 0.15, 0.4), 350); 
+                break;
+
+            // === BASIC GAME EFFECTS ===
+            case 'JUMP': playTone('sine', 150, 300, 0.2, 0.3); break;
+            case 'PICKUP': playArp('square', [600, 800, 1200], 0.08, 0.2); break;
+            case 'DEATH': playTone('triangle', 400, 10, 1.5, 0.5); playNoise(1.0, 300, 0.5); break;
+            case 'MENU': playTone('square', 600, 600, 0.05, 0.2); break;
+            
+            // UPDATED: Chip's Challenge "Uhh" raspy low square wave
+            case 'HURT': 
+                playTone('square', 140, 110, 0.15, 0.4); 
+                break;
+        }
+    }
+</script>
+</body>
+</html>

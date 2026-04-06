@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revival - Music Forge</title>
+    <style>
+        body { background-color: #111; color: white; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
+        h1 { color: #FF0; text-shadow: 2px 2px 0px #000; font-size: 40px; margin-bottom: 5px; text-align: center;}
+        p.subtitle { color: #AAA; margin-bottom: 30px; text-align: center; max-width: 600px; line-height: 1.5; }
+        
+        .jukebox { background: #222; border: 4px solid #555; border-radius: 10px; width: 600px; padding: 20px; box-shadow: 0px 0px 20px #000; display: flex; flex-direction: column; align-items: center; }
+        
+        .display { background: #000; border: 2px inset #555; width: 100%; height: 60px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; }
+        .track-title { color: #0FF; font-size: 20px; font-weight: bold; }
+        .status { color: #F00; font-weight: bold; animation: none; }
+        
+        .btn-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .track-btn { background: #333; color: #FFF; border: 2px solid #666; padding: 15px; font-size: 18px; font-family: inherit; cursor: pointer; text-align: left; display: flex; justify-content: space-between; }
+        .track-btn:hover { background: #444; border-color: #FFF; }
+        .track-btn.active { background: #0AA; border-color: #0FF; color: #000; font-weight: bold; }
+        
+        .stop-btn { background: #A00; color: #FFF; border: 2px solid #F00; padding: 15px; font-size: 20px; font-weight: bold; font-family: inherit; cursor: pointer; margin-top: 20px; width: 100%; text-align: center; }
+        .stop-btn:hover { background: #F00; }
+        .stop-btn:active { transform: translateY(2px); }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        .playing-blink { animation: blink 0.5s infinite; color: #0F0 !important; }
+
+        .visualizer { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; max-width: 100%;}
+        .step-light { width: 15px; height: 15px; background: #333; border-radius: 50%; border: 1px solid #111; }
+        .step-light.lit { background: #0F0; box-shadow: 0 0 10px #0F0; }
+    </style>
+</head>
+<body>
+
+    <h1>8-BIT JUKEBOX</h1>
+    <p class="subtitle">Sample the newly arranged Main Menu Theme. The tribal rhythm is now the Chorus, with a new heroic Verse 1, and drum-fills added to smoothly blend the sections together.</p>
+
+    <div class="jukebox">
+        <div class="display">
+            <div class="track-title" id="displayTitle">NO TRACK SELECTED</div>
+            <div class="status" id="displayStatus">STOPPED</div>
+        </div>
+        
+        <div class="visualizer" id="visGrid">
+            </div>
+
+        <div class="btn-list" id="trackButtons">
+            <button class="track-btn" onclick="playSong(0)">1. Trench Warfare <span>[125 BPM]</span></button>
+            <button class="track-btn" onclick="playSong(1)">2. Final Stand <span>[120 BPM]</span></button>
+            <button class="track-btn" onclick="playSong(2)">3. Neon Skirmish <span>[150 BPM]</span></button>
+            <button class="track-btn" onclick="playSong(3)">4. Crystal Ruins <span>[125 BPM]</span></button>
+            <button class="track-btn" onclick="playSong(4)">5. Overclocked <span>[160 BPM]</span></button>
+            <button class="track-btn" onclick="playSong(5)" style="border-color: #FF0; color: #FF0;">★ Revival Main Theme <span>[120 BPM / Epic Blended]</span></button>
+        </div>
+
+        <button class="stop-btn" onclick="stopMusic()">⏹ STOP AUDIO</button>
+    </div>
+
+<script>
+    const visGrid = document.getElementById('visGrid');
+    const lights = [];
+    for(let i=0; i<16; i++) {
+        let d = document.createElement('div'); d.className = 'step-light';
+        visGrid.appendChild(d); lights.push(d);
+    }
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+    let isPlaying = false; let currentStep = 0; let nextNoteTime = 0.0;
+    let lookahead = 25.0; let scheduleAheadTime = 0.1; let timerID;
+
+    function mtof(note) { return 440 * Math.pow(2, (note - 69) / 12); }
+
+    // --- PROCEDURAL GENERATION: THE BLENDED MAIN THEME ---
+    
+    // NEW PART A: The Tribal Chorus (Formerly Verse 1)
+    let lA1 = [74,74,-1,74, -1,77,-1,74, 74,74,-1,74, -1,77,76,74, 72,72,-1,72, -1,76,-1,72, 72,72,-1,72, -1,76,74,72];
+    let lA2 = [74,74,-1,74, -1,77,-1,74, 74,74,-1,74, -1,81,79,77, 76,-1,-1,-1, 79,-1,-1,-1, 81,-1,-1,-1, 86,-1,-1,-1];
+    // Blend edit: Added a 3-note walk-down at the end to lead into the next section
+    let lA3 = [86,86,-1,86, -1,89,-1,86, 86,86,-1,86, -1,89,88,86, 84,84,-1,84, -1,88,-1,84, 84,84,-1,84, -1,81,79,76]; 
+    let bA1 = [38,38,-1,38, 38,-1,38,38, 38,38,-1,38, 38,-1,38,38, 36,36,-1,36, 36,-1,36,36, 36,36,-1,36, 36,-1,36,36];
+    let bA2 = [38,38,-1,38, 38,-1,38,38, 38,38,-1,38, 38,-1,38,38, 41,41,-1,41, 43,43,-1,43, 45,45,-1,45, 48,48,-1,48];
+    // Blend edit: Walking bassline down
+    let bA3 = [50,50,-1,50, 50,-1,50,50, 50,50,-1,50, 50,-1,50,50, 48,48,-1,48, 48,-1,48,48, 48,48,-1,48, 48,-1,45,41]; 
+    let dA1 = [4,1,1,4, 1,4,1,1, 4,1,1,4, 1,4,2,2, 4,1,1,4, 1,4,1,1, 4,1,1,4, 1,4,2,2];
+    // Blend edit: Snare roll fill at the end of the chorus
+    let dA3 = [4,1,1,4, 1,4,1,1, 4,1,1,4, 1,4,2,2, 4,1,1,4, 1,4,1,1, 4,1,1,4, 2,2,5,5]; 
+
+    // NEW PART B: The Heroic Verse (Soaring, melodic, driving march)
+    let lB1 = [74,-1,-1,74, -1,76,-1,79, -1,81,-1,79, -1,76,-1,74, 74,-1,-1,74, -1,76,-1,79, -1,-1,-1,-1, -1,-1,-1,-1];
+    let lB2 = [74,-1,-1,74, -1,76,-1,79, -1,81,-1,86, -1,84,-1,81, 79,-1,-1,79, -1,81,-1,76, -1,-1,-1,-1, -1,-1,-1,-1];
+    // Blend edit: Walk down melody to re-enter the chorus at note 74
+    let lB3 = [81,-1,-1,-1, 84,-1,-1,-1, 86,-1,-1,-1, 84,-1,81,-1, 79,-1,-1,-1, 76,-1,-1,-1, 74,76,79,76, 74,72,69,72]; 
+    let bB1 = [43,-1,43,-1, 43,-1,43,-1, 45,-1,45,-1, 45,-1,45,-1, 41,-1,41,-1, 41,-1,41,-1, 43,-1,43,-1, 43,-1,43,-1];
+    let bB2 = [43,-1,43,-1, 43,-1,43,-1, 45,-1,45,-1, 45,-1,45,-1, 48,-1,48,-1, 48,-1,48,-1, 50,-1,50,-1, 50,-1,50,-1];
+    let bB3 = [55,-1,55,-1, 57,-1,57,-1, 58,-1,58,-1, 57,-1,55,-1, 50,-1,50,-1, 48,-1,48,-1, 45,-1,45,-1, 43,-1,41,-1];
+    let dB1 = [4,0,1,0, 2,0,1,0, 4,0,1,0, 2,0,1,1, 4,0,1,0, 2,0,1,0, 4,0,1,0, 2,0,2,2];
+    // Blend edit: Big drum fill to blast back into the chorus
+    let dB3 = [4,0,1,0, 2,0,1,0, 4,0,1,0, 2,0,1,1, 4,0,1,0, 2,0,1,0, 2,2,2,2, 5,5,5,5]; 
+
+    // PART C: Verse 2 (The Dark Tension Build)
+    let lC1 = [69,-1,74,-1, 76,-1,77,-1, 76,-1,74,-1, 69,-1,-1,-1, 69,-1,74,-1, 76,-1,77,-1, 81,-1,79,-1, 77,-1,-1,-1];
+    let lC2 = [81,-1,79,-1, 77,-1,76,-1, 74,-1,76,-1, 77,-1,79,-1, 81,-1,-1,-1, -1,-1,-1,-1, 86,-1,-1,-1, -1,-1,-1,-1];
+    let lC3 = [74,74,74,74, 76,76,76,76, 77,77,77,77, 79,79,79,79, 81,81,81,81, 82,82,82,82, 84,84,84,84, 86,86,86,86]; 
+    let bC1 = [45,-1,-1,-1,-1,-1,-1,-1, 46,-1,-1,-1,-1,-1,-1,-1, 45,-1,-1,-1,-1,-1,-1,-1, 48,-1,-1,-1,-1,-1,-1,-1];
+    let bC2 = [45,-1,-1,-1,-1,-1,-1,-1, 46,-1,-1,-1,-1,-1,-1,-1, 48,-1,-1,-1,-1,-1,-1,-1, 50,-1,-1,-1,-1,-1,-1,-1];
+    let bC3 = [45,-1,45,-1, 46,-1,46,-1, 48,-1,48,-1, 50,-1,50,-1, 52,-1,52,-1, 53,-1,53,-1, 55,-1,55,-1, 57,-1,57,-1];
+    let dC1 = [1,0,3,0, 2,0,3,0, 1,0,3,0, 2,0,3,0, 1,0,3,0, 2,0,3,0, 1,0,3,0, 2,0,3,0];
+    // Blend edit: Massive 16th note snare roll drop
+    let dC3 = [1,1,1,1, 2,2,2,2, 5,5,5,5, 5,5,5,5, 5,5,5,5, 5,5,5,5, 5,5,5,5, 5,5,5,5]; 
+
+    let PartA = { l: [...lA1, ...lA2, ...lA3], b: [...bA1, ...bA2, ...bA3], d: [...dA1, ...dA1, ...dA3] };
+    let PartB = { l: [...lB1, ...lB2, ...lB3], b: [...bB1, ...bB2, ...bB3], d: [...dB1, ...dB1, ...dB3] };
+    let PartC = { l: [...lC1, ...lC2, ...lC3], b: [...bC1, ...bC2, ...bC3], d: [...dC1, ...dC1, ...dC3] };
+
+    // The Master 672-step Assembly: Chorus -> V1 -> Chorus -> V2 -> Chorus -> V1 -> Chorus
+    let ThemeLead = [...PartA.l, ...PartB.l, ...PartA.l, ...PartC.l, ...PartA.l, ...PartB.l, ...PartA.l];
+    let ThemeBass = [...PartA.b, ...PartB.b, ...PartA.b, ...PartC.b, ...PartA.b, ...PartB.b, ...PartA.b];
+    let ThemeDrum = [...PartA.d, ...PartB.d, ...PartA.d, ...PartC.d, ...PartA.d, ...PartB.d, ...PartA.d];
+
+    // --- THE SONGS ARRAY ---
+    const SONGS = [
+        { title: "Trench Warfare", bpm: 125,
+          lead: [60,-1,60,63,-1,60,-1,65, -1,60,60,66,-1,65,63,-1, 60,-1,60,63,-1,60,-1,65, -1,60,60,67,-1,66,65,63],
+          bass: [36,-1,36,-1,36,-1,36,36, 36,-1,36,-1,36,-1,36,36, 36,-1,36,-1,36,-1,36,36, 36,-1,36,-1,36,-1,36,36],
+          drum: [4,0,1,0, 2,0,0,0, 4,0,1,0, 2,0,1,1, 4,0,1,0, 2,0,0,0, 4,0,1,0, 2,0,1,1] },
+        { title: "Final Stand", bpm: 120,
+          lead: [79,-1,-1,-1, 79,79,77,75, 77,-1,-1,-1, -1,-1,-1,-1, 75,-1,-1,-1, 75,75,74,72, 74,-1,-1,-1, -1,-1,-1,-1],
+          bass: [43,-1,43,43, 43,-1,43,-1, 45,-1,45,45, 45,-1,45,-1, 46,-1,46,46, 46,-1,46,-1, 48,-1,48,48, 48,-1,48,-1],
+          drum: [4,0,2,0, 1,2,1,2, 4,0,2,0, 1,2,1,2, 4,0,2,0, 1,2,1,2, 4,0,2,0, 1,2,1,2] },
+        { title: "Neon Skirmish", bpm: 150,
+          lead: [72,-1,75,-1,79,-1,75,-1, 72,-1,75,-1,77,-1,75,-1, 72,-1,75,-1,84,-1,79,-1, 77,75,72,75,77,-1,-1,-1],
+          bass: [48,48,48,48,48,48,48,48, 44,44,44,44,46,46,46,46, 48,48,48,48,48,48,48,48, 44,44,44,44,46,46,46,46],
+          drum: [4,3,3,3, 5,3,3,3, 4,3,3,3, 5,3,3,3, 4,3,3,3, 5,3,3,3, 4,3,3,3, 5,3,3,3] },
+        { title: "Crystal Ruins", bpm: 125,
+          lead: [65,68,72,77, 65,68,72,77, 67,70,74,79, 67,70,74,79, 68,72,75,80, 68,72,75,80, 64,67,72,76, 64,67,72,76],
+          bass: [41,-1,-1,-1, -1,-1,-1,-1, 43,-1,-1,-1, -1,-1,-1,-1, 44,-1,-1,-1, -1,-1,-1,-1, 40,-1,-1,-1, -1,-1,-1,-1],
+          drum: [4,0,3,0, 5,0,3,0, 4,0,3,0, 5,0,3,0, 4,0,3,0, 5,0,3,0, 4,0,3,0, 5,0,3,0] },
+        { title: "Overclocked", bpm: 160,
+          lead: [72,71,72,75, 72,71,72,78, 72,71,72,75, 80,79,78,77, 72,71,72,75, 72,71,72,78, 84,83,82,81, 80,79,78,77],
+          bass: [48,-1,48,48, -1,48,48,-1, 45,-1,45,45, -1,45,45,-1, 43,-1,43,43, -1,43,43,-1, 47,-1,47,47, -1,47,47,-1],
+          drum: [4,1,2,1, 4,1,2,1, 4,1,2,1, 4,1,2,1, 4,1,2,1, 4,1,2,1, 4,1,2,1, 4,1,2,1] },
+        { title: "Revival Main Theme", bpm: 120,
+          lead: ThemeLead, bass: ThemeBass, drum: ThemeDrum }
+    ];
+
+    let currentSong = null;
+
+    function playSynth(freq, type, time, dur, vol) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(freq, time);
+        gain.gain.setValueAtTime(0, time);
+        gain.gain.linearRampToValueAtTime(vol, time + 0.02);
+        gain.gain.setValueAtTime(vol, time + dur - 0.05);
+        gain.gain.linearRampToValueAtTime(0, time + dur);
+        osc.start(time); osc.stop(time + dur);
+    }
+
+    function playKick(time) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(150, time);
+        osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.1); 
+        gain.gain.setValueAtTime(0.8, time);
+        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
+        osc.start(time); osc.stop(time + 0.1);
+    }
+
+    function playSnare(time) {
+        const bufferSize = audioCtx.sampleRate * 0.1;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; 
+        
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass'; filter.frequency.value = 1000;
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.5, time);
+        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
+        
+        noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+        noise.start(time);
+    }
+
+    function playHiHat(time) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(4000, time); 
+        gain.gain.setValueAtTime(0.1, time);
+        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.03);
+        osc.start(time); osc.stop(time + 0.03);
+    }
+
+    function scheduleNote(stepNum, time) {
+        let noteDur = (60.0 / currentSong.bpm) * 0.25; 
+        
+        if (currentSong.lead[stepNum] !== -1) playSynth(mtof(currentSong.lead[stepNum]), 'square', time, noteDur * 0.8, 0.15);
+        if (currentSong.bass[stepNum] !== -1) playSynth(mtof(currentSong.bass[stepNum]), 'triangle', time, noteDur * 0.9, 0.3);
+        
+        let d = currentSong.drum[stepNum];
+        if (d === 1 || d === 4 || d === 5) playKick(time);
+        if (d === 2 || d === 5) playSnare(time);
+        if (d === 3 || d === 4 || d === 5) playHiHat(time);
+
+        let visualStep = stepNum % 16;
+        setTimeout(() => {
+            lights.forEach(l => l.classList.remove('lit'));
+            lights[visualStep].classList.add('lit');
+        }, (time - audioCtx.currentTime) * 1000);
+    }
+
+    function nextNote() {
+        const secondsPerBeat = 60.0 / currentSong.bpm;
+        nextNoteTime += 0.25 * secondsPerBeat; 
+        currentStep++;
+        if (currentStep === currentSong.lead.length) currentStep = 0; 
+    }
+
+    function scheduler() {
+        while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+            scheduleNote(currentStep, nextNoteTime);
+            nextNote();
+        }
+        timerID = setTimeout(scheduler, lookahead);
+    }
+
+    function playSong(index) {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        stopMusic(); 
+        currentSong = SONGS[index];
+        isPlaying = true;
+        currentStep = 0;
+        nextNoteTime = audioCtx.currentTime + 0.1;
+
+        document.getElementById('displayTitle').innerText = currentSong.title;
+        let stat = document.getElementById('displayStatus');
+        stat.innerText = "▶ PLAYING";
+        stat.className = "status playing-blink";
+        
+        let btns = document.getElementsByClassName('track-btn');
+        for(let i=0; i<btns.length; i++) btns[i].classList.remove('active');
+        btns[index].classList.add('active');
+
+        scheduler(); 
+    }
+
+    function stopMusic() {
+        isPlaying = false;
+        clearTimeout(timerID);
+        lights.forEach(l => l.classList.remove('lit'));
+        document.getElementById('displayTitle').innerText = "NO TRACK SELECTED";
+        let stat = document.getElementById('displayStatus');
+        stat.innerText = "STOPPED";
+        stat.className = "status";
+        let btns = document.getElementsByClassName('track-btn');
+        for(let i=0; i<btns.length; i++) btns[i].classList.remove('active');
+    }
+</script>
+</body>
+</html>

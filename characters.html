@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revival - Sprite Forge</title>
+    <style>
+        body { background-color: #111; color: white; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
+        h1 { color: #0FF; text-shadow: 2px 2px 0px #000; font-size: 40px; margin-bottom: 5px; text-align: center;}
+        p.subtitle { color: #AAA; margin-bottom: 30px; text-align: center; max-width: 600px; line-height: 1.5; }
+        
+        .controls { margin-bottom: 30px; }
+        button { background: #444; color: #FFF; border: 2px solid #888; padding: 10px 20px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 5px; font-family: inherit; margin: 0 10px;}
+        button:hover { background: #666; border-color: #FFF; }
+        
+        #btnP1 { background: #505; border-color: #F0F; color: #F0F; }
+        #btnP1:hover { background: #F0F; color: #000; }
+        #btnP2 { background: #050; border-color: #0F0; color: #0F0; }
+        #btnP2:hover { background: #0F0; color: #000; }
+
+        .grid { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; max-width: 900px; }
+        
+        .card { background: #222; border: 2px solid #555; border-radius: 8px; width: 180px; padding: 20px; display: flex; flex-direction: column; align-items: center; box-shadow: 0px 4px 0px #000; }
+        .card h2 { color: #FF0; font-size: 18px; margin-top: 0; text-align: center; height: 40px;}
+        
+        /* The canvas draws an 8x8 sprite scaled up heavily */
+        canvas { background-color: #000; border: 2px inset #555; image-rendering: pixelated; width: 128px; height: 128px; margin-bottom: 15px; }
+        
+        .desc { font-size: 12px; color: #AAA; text-align: center; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <h1>CHARACTER FORGE</h1>
+    <p class="subtitle">Watch the animated walk cycles below. Click the buttons to simulate the dynamic color-swapping engine that will differentiate Player 1 and Player 2.</p>
+
+    <div class="controls">
+        <button id="btnP1" onclick="setColor('P1')">View as Player 1 (Purple)</button>
+        <button id="btnP2" onclick="setColor('P2')">View as Player 2 (Green)</button>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>A) Classic Soldier</h2>
+            <canvas id="canvA" width="8" height="8"></canvas>
+            <div class="desc">Bandana, tactical vest, bare arms. Strong 90s arcade vibes.</div>
+        </div>
+        <div class="card">
+            <h2>B) Space Marine</h2>
+            <canvas id="canvB" width="8" height="8"></canvas>
+            <div class="desc">Heavy armor, large glass visor. Sci-fi tactical aesthetic.</div>
+        </div>
+        <div class="card">
+            <h2>C) Cute Spaceman</h2>
+            <canvas id="canvC" width="8" height="8"></canvas>
+            <div class="desc">Round body, massive helmet window. Minimalist and charming.</div>
+        </div>
+        <div class="card">
+            <h2>D) Cyber-Ninja</h2>
+            <canvas id="canvD" width="8" height="8"></canvas>
+            <div class="desc">Sleek black stealth suit, glowing eye, bright scarf.</div>
+        </div>
+    </div>
+
+<script>
+    // State variables
+    let currentFrame = 0;
+    let primaryColor = '#FF00FF'; // Default to P1 Purple
+    let darkColor = '#A000A0';    // Dark shade for pants/shadows
+
+    // The Color Palette
+    // P = Primary Color, D = Dark Primary Color
+    const palette = {
+        'w':'#FFF', 'k':'#000', 'g':'#555', 'l':'#AAA', 'r':'#F00', 
+        'c':'#0FF', 's':'#FFCC99', // s = Skin tone
+    };
+
+    // --- SPRITE DESIGNS (8x8 arrays) ---
+
+    // A) Classic Soldier
+    const soldier = [
+        [ // Frame 0: Idle
+         "  rr    ",
+         " sssk   ",
+         " sss    ",
+         " PPPgg  ",
+         " sPg    ",
+         " PPP    ",
+         " D D    ",
+         " k k    "],
+        [ // Frame 1: Walk
+         "  rr    ",
+         " sssk   ",
+         " sss    ",
+         " PPPgg  ",
+         " sPg    ",
+         " PPP    ",
+         "  DD    ",
+         " k  k   "]
+    ];
+
+    // B) Space Marine
+    const marine = [
+        [ // Frame 0: Idle
+         "  PPP   ",
+         " PcccP  ",
+         "  PPP   ",
+         " PPPgg  ",
+         " PPP    ",
+         " DDD    ",
+         " D D    ",
+         " k k    "],
+        [ // Frame 1: Walk
+         "  PPP   ",
+         " PcccP  ",
+         "  PPP   ",
+         " PPPgg  ",
+         " PPP    ",
+         " DDD    ",
+         "  D D   ",
+         "  k  k  "]
+    ];
+
+    // C) Cute Spaceman
+    const spaceman = [
+        [ // Frame 0: Idle
+         "  PPP   ",
+         " PccwP  ",
+         " PcccP  ",
+         " PPPPPg ",
+         " PPPPP  ",
+         " PPPPP  ",
+         "  D D   ",
+         "  k k   "],
+        [ // Frame 1: Walk
+         "  PPP   ",
+         " PccwP  ",
+         " PcccP  ",
+         " PPPPPg ",
+         " PPPPP  ",
+         " PPPPP  ",
+         "   DD   ",
+         "  k  k  "]
+    ];
+
+    // D) Cyber-Ninja
+    const ninja = [
+        [ // Frame 0: Idle
+         "  kkk   ",
+         " kkPkk  ",
+         " Dkkkk  ",
+         " Dkkgg  ",
+         " Dkg    ",
+         " Dgg    ",
+         " g g    ",
+         " k k    "],
+        [ // Frame 1: Walk
+         "  kkk   ",
+         " kkPkk  ",
+         " Dkkkk  ",
+         " Dkkgg  ",
+         " Dkg    ",
+         " Dgg    ",
+         "  gg    ",
+         " k  k   "]
+    ];
+
+    function drawSprite(canvasId, spriteData) {
+        const c = document.getElementById(canvasId);
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, 8, 8);
+        
+        let frameData = spriteData[currentFrame];
+        
+        for(let row=0; row<8; row++) {
+            for(let col=0; col<8; col++) {
+                let char = frameData[row][col];
+                if (char !== ' ') {
+                    if (char === 'P') ctx.fillStyle = primaryColor;
+                    else if (char === 'D') ctx.fillStyle = darkColor;
+                    else ctx.fillStyle = palette[char];
+                    
+                    ctx.fillRect(col, row, 1, 1);
+                }
+            }
+        }
+    }
+
+    // Animation Loop
+    setInterval(() => {
+        currentFrame = currentFrame === 0 ? 1 : 0;
+        drawSprite('canvA', soldier);
+        drawSprite('canvB', marine);
+        drawSprite('canvC', spaceman);
+        drawSprite('canvD', ninja);
+    }, 400); // Swaps frame every 400ms
+
+    // Color Swapper
+    function setColor(player) {
+        if (player === 'P1') {
+            primaryColor = '#FF00FF'; // Purple
+            darkColor = '#A000A0';    // Dark Purple
+        } else {
+            primaryColor = '#00FF00'; // Green
+            darkColor = '#00A000';    // Dark Green
+        }
+        // Force redraw immediately
+        drawSprite('canvA', soldier);
+        drawSprite('canvB', marine);
+        drawSprite('canvC', spaceman);
+        drawSprite('canvD', ninja);
+    }
+</script>
+</body>
+</html>
