@@ -1,0 +1,254 @@
+{
+  "SHOTGUN": {
+    "index": 0,
+    "sprite_col": 0,
+    "sprite_row": 0,
+    "sprite_x": 0,
+    "sprite_y": 0
+  },
+  "BAZOOKA": {
+    "index": 1,
+    "sprite_col": 1,
+    "sprite_row": 0,
+    "sprite_x": 8,
+    "sprite_y": 0
+  },
+  "GRENADE": {
+    "index": 2,
+    "sprite_col": 2,
+    "sprite_row": 0,
+    "sprite_x": 16,
+    "sprite_y": 0
+  },
+  "MACHINEGUN": {
+    "index": 3,
+    "sprite_col": 3,
+    "sprite_row": 0,
+    "sprite_x": 24,
+    "sprite_y": 0
+  },
+  "REAR TURRET": {
+    "index": 4,
+    "sprite_col": 4,
+    "sprite_row": 0,
+    "sprite_x": 32,
+    "sprite_y": 0
+  },
+  "MINE": {
+    "index": 5,
+    "sprite_col": 5,
+    "sprite_row": 0,
+    "sprite_x": 40,
+    "sprite_y": 0
+  },
+  "HEADSPINNER": {
+    "index": 6,
+    "sprite_col": 6,
+    "sprite_row": 0,
+    "sprite_x": 48,
+    "sprite_y": 0
+  },
+  "ENERGY BOLT": {
+    "index": 7,
+    "sprite_col": 7,
+    "sprite_row": 0,
+    "sprite_x": 56,
+    "sprite_y": 0
+  },
+  "HEAL": {
+    "index": 8,
+    "sprite_col": 0,
+    "sprite_row": 1,
+    "sprite_x": 0,
+    "sprite_y": 8
+  },
+  "PLASMA WALL": {
+    "index": 9,
+    "sprite_col": 1,
+    "sprite_row": 1,
+    "sprite_x": 8,
+    "sprite_y": 8
+  },
+  "IR PULSE GUN": {
+    "index": 10,
+    "sprite_col": 2,
+    "sprite_row": 1,
+    "sprite_x": 16,
+    "sprite_y": 8
+  },
+  "CLUSTER BOMB": {
+    "index": 11,
+    "sprite_col": 3,
+    "sprite_row": 1,
+    "sprite_x": 24,
+    "sprite_y": 8
+  },
+  "MEGA SPEED": {
+    "index": 12,
+    "sprite_col": 4,
+    "sprite_row": 1,
+    "sprite_x": 32,
+    "sprite_y": 8
+  },
+  "TELEPORT": {
+    "index": 13,
+    "sprite_col": 5,
+    "sprite_row": 1,
+    "sprite_x": 40,
+    "sprite_y": 8
+  },
+  "LASER": {
+    "index": 14,
+    "sprite_col": 6,
+    "sprite_row": 1,
+    "sprite_x": 48,
+    "sprite_y": 8
+  },
+  "CLOAKER": {
+    "index": 15,
+    "sprite_col": 7,
+    "sprite_row": 1,
+    "sprite_x": 56,
+    "sprite_y": 8
+  },
+  "TOXIC FART": {
+    "index": 16,
+    "sprite_col": 0,
+    "sprite_row": 2,
+    "sprite_x": 0,
+    "sprite_y": 16
+  },
+  "FREEZER": {
+    "index": 17,
+    "sprite_col": 1,
+    "sprite_row": 2,
+    "sprite_x": 8,
+    "sprite_y": 16
+  },
+  "FAKE": {
+    "index": 18,
+    "sprite_col": 2,
+    "sprite_row": 2,
+    "sprite_x": 16,
+    "sprite_y": 16
+  },
+  "BOOMERANG": {
+    "index": 19,
+    "sprite_col": 3,
+    "sprite_row": 2,
+    "sprite_x": 24,
+    "sprite_y": 16
+  },
+  "GHOST": {
+    "index": 20,
+    "sprite_col": 4,
+    "sprite_row": 2,
+    "sprite_x": 32,
+    "sprite_y": 16
+  },
+  "ANTS": {
+    "index": 21,
+    "sprite_col": 5,
+    "sprite_row": 2,
+    "sprite_x": 40,
+    "sprite_y": 16
+  },
+  "SUPERBRIDGE": {
+    "index": 22,
+    "sprite_col": 6,
+    "sprite_row": 2,
+    "sprite_x": 48,
+    "sprite_y": 16
+  },
+  "HOLDTROOPER": {
+    "index": 23,
+    "sprite_col": 7,
+    "sprite_row": 2,
+    "sprite_x": 56,
+    "sprite_y": 16
+  },
+  "STEAL": {
+    "index": 24,
+    "sprite_col": 0,
+    "sprite_row": 3,
+    "sprite_x": 0,
+    "sprite_y": 24
+  },
+  "VOODOO": {
+    "index": 25,
+    "sprite_col": 1,
+    "sprite_row": 3,
+    "sprite_x": 8,
+    "sprite_y": 24
+  },
+  "AIRSTRIKE": {
+    "index": 26,
+    "sprite_col": 2,
+    "sprite_row": 3,
+    "sprite_x": 16,
+    "sprite_y": 24
+  },
+  "MINIGUN": {
+    "index": 27,
+    "sprite_col": 3,
+    "sprite_row": 3,
+    "sprite_x": 24,
+    "sprite_y": 24
+  },
+  "ROLLING BOULDER": {
+    "index": 28,
+    "sprite_col": 4,
+    "sprite_row": 3,
+    "sprite_x": 32,
+    "sprite_y": 24
+  },
+  "SPEAR": {
+    "index": 29,
+    "sprite_col": 5,
+    "sprite_row": 3,
+    "sprite_x": 40,
+    "sprite_y": 24
+  },
+  "SHEEP": {
+    "index": 30,
+    "sprite_col": 6,
+    "sprite_row": 3,
+    "sprite_x": 48,
+    "sprite_y": 24
+  },
+  "SPREADFIRE GUN": {
+    "index": 31,
+    "sprite_col": 7,
+    "sprite_row": 3,
+    "sprite_x": 56,
+    "sprite_y": 24
+  },
+  "REDGUN": {
+    "index": 32,
+    "sprite_col": 0,
+    "sprite_row": 4,
+    "sprite_x": 0,
+    "sprite_y": 32
+  },
+  "MISSLE TOWER": {
+    "index": 33,
+    "sprite_col": 1,
+    "sprite_row": 4,
+    "sprite_x": 8,
+    "sprite_y": 32
+  },
+  "HOMING MISSLE": {
+    "index": 34,
+    "sprite_col": 2,
+    "sprite_row": 4,
+    "sprite_x": 16,
+    "sprite_y": 32
+  },
+  "MEGA JUMP": {
+    "index": 35,
+    "sprite_col": 3,
+    "sprite_row": 4,
+    "sprite_x": 24,
+    "sprite_y": 32
+  }
+}

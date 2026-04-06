@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Weapons Sprite Reference</title>
+<style>
+body { background: #111; color: #eee; font-family: monospace; padding: 20px; }
+h1 { color: #f55; }
+h2 { color: #aaa; }
+table { border-collapse: collapse; }
+th { background: #333; padding: 6px 10px; border: 1px solid #555; color: #ff9; }
+td { padding: 4px 10px; border: 1px solid #333; font-size: 13px; }
+td:nth-child(1) { color: #8f8; font-weight: bold; }
+.grid-cell { display: inline-block; width: 80px; height: 80px; background: #000; 
+             border: 1px solid #444; position: relative; text-align: center; vertical-align: top; margin: 2px; }
+.grid-cell canvas { image-rendering: pixelated; display: block; margin: 8px auto 2px; }
+.grid-label { font-size: 9px; color: #aaa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 2px; }
+.grid-idx { font-size: 9px; color: #666; }
+</style>
+</head>
+<body>
+<h1>Weapons Sprite Sheet Reference</h1>
+<h2>Sprite: 64×40px | Each tile: 8×8px | Grid: 8×5</h2>
+
+<h2>Reference Table</h2>
+<table>
+<tr><th>#</th><th>Weapon</th><th>Row</th><th>Col</th><th>X (px)</th><th>Y (px)</th></tr>
+<tr><td>0</td><td>SHOTGUN</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>1</td><td>BAZOOKA</td><td>0</td><td>1</td><td>8</td><td>0</td></tr>
+<tr><td>2</td><td>GRENADE</td><td>0</td><td>2</td><td>16</td><td>0</td></tr>
+<tr><td>3</td><td>MACHINEGUN</td><td>0</td><td>3</td><td>24</td><td>0</td></tr>
+<tr><td>4</td><td>REAR TURRET</td><td>0</td><td>4</td><td>32</td><td>0</td></tr>
+<tr><td>5</td><td>MINE</td><td>0</td><td>5</td><td>40</td><td>0</td></tr>
+<tr><td>6</td><td>HEADSPINNER</td><td>0</td><td>6</td><td>48</td><td>0</td></tr>
+<tr><td>7</td><td>ENERGY BOLT</td><td>0</td><td>7</td><td>56</td><td>0</td></tr>
+<tr><td>8</td><td>HEAL</td><td>1</td><td>0</td><td>0</td><td>8</td></tr>
+<tr><td>9</td><td>PLASMA WALL</td><td>1</td><td>1</td><td>8</td><td>8</td></tr>
+<tr><td>10</td><td>IR PULSE GUN</td><td>1</td><td>2</td><td>16</td><td>8</td></tr>
+<tr><td>11</td><td>CLUSTER BOMB</td><td>1</td><td>3</td><td>24</td><td>8</td></tr>
+<tr><td>12</td><td>MEGA SPEED</td><td>1</td><td>4</td><td>32</td><td>8</td></tr>
+<tr><td>13</td><td>TELEPORT</td><td>1</td><td>5</td><td>40</td><td>8</td></tr>
+<tr><td>14</td><td>LASER</td><td>1</td><td>6</td><td>48</td><td>8</td></tr>
+<tr><td>15</td><td>CLOAKER</td><td>1</td><td>7</td><td>56</td><td>8</td></tr>
+<tr><td>16</td><td>TOXIC FART</td><td>2</td><td>0</td><td>0</td><td>16</td></tr>
+<tr><td>17</td><td>FREEZER</td><td>2</td><td>1</td><td>8</td><td>16</td></tr>
+<tr><td>18</td><td>FAKE</td><td>2</td><td>2</td><td>16</td><td>16</td></tr>
+<tr><td>19</td><td>BOOMERANG</td><td>2</td><td>3</td><td>24</td><td>16</td></tr>
+<tr><td>20</td><td>GHOST</td><td>2</td><td>4</td><td>32</td><td>16</td></tr>
+<tr><td>21</td><td>ANTS</td><td>2</td><td>5</td><td>40</td><td>16</td></tr>
+<tr><td>22</td><td>SUPERBRIDGE</td><td>2</td><td>6</td><td>48</td><td>16</td></tr>
+<tr><td>23</td><td>HOLDTROOPER</td><td>2</td><td>7</td><td>56</td><td>16</td></tr>
+<tr><td>24</td><td>STEAL</td><td>3</td><td>0</td><td>0</td><td>24</td></tr>
+<tr><td>25</td><td>VOODOO</td><td>3</td><td>1</td><td>8</td><td>24</td></tr>
+<tr><td>26</td><td>AIRSTRIKE</td><td>3</td><td>2</td><td>16</td><td>24</td></tr>
+<tr><td>27</td><td>MINIGUN</td><td>3</td><td>3</td><td>24</td><td>24</td></tr>
+<tr><td>28</td><td>ROLLING BOULDER</td><td>3</td><td>4</td><td>32</td><td>24</td></tr>
+<tr><td>29</td><td>SPEAR</td><td>3</td><td>5</td><td>40</td><td>24</td></tr>
+<tr><td>30</td><td>SHEEP</td><td>3</td><td>6</td><td>48</td><td>24</td></tr>
+<tr><td>31</td><td>SPREADFIRE GUN</td><td>3</td><td>7</td><td>56</td><td>24</td></tr>
+<tr><td>32</td><td>REDGUN</td><td>4</td><td>0</td><td>0</td><td>32</td></tr>
+<tr><td>33</td><td>MISSLE TOWER</td><td>4</td><td>1</td><td>8</td><td>32</td></tr>
+<tr><td>34</td><td>HOMING MISSLE</td><td>4</td><td>2</td><td>16</td><td>32</td></tr>
+<tr><td>35</td><td>MEGA JUMP</td><td>4</td><td>3</td><td>24</td><td>32</td></tr>
+</table>
+
+<h2>Grid Layout</h2>
+<table border="1" style="border-collapse:collapse">
+<tr><th></th><th>Col 0</th><th>Col 1</th><th>Col 2</th><th>Col 3</th><th>Col 4</th><th>Col 5</th><th>Col 6</th><th>Col 7</th></tr>
+<tr><th>Row 0</th><td style='padding:6px 10px'>SHOTGUN</td><td style='padding:6px 10px'>BAZOOKA</td><td style='padding:6px 10px'>GRENADE</td><td style='padding:6px 10px'>MACHINEGUN</td><td style='padding:6px 10px'>REAR TURRET</td><td style='padding:6px 10px'>MINE</td><td style='padding:6px 10px'>HEADSPINNER</td><td style='padding:6px 10px'>ENERGY BOLT</td></tr>
+<tr><th>Row 1</th><td style='padding:6px 10px'>HEAL</td><td style='padding:6px 10px'>PLASMA WALL</td><td style='padding:6px 10px'>IR PULSE GUN</td><td style='padding:6px 10px'>CLUSTER BOMB</td><td style='padding:6px 10px'>MEGA SPEED</td><td style='padding:6px 10px'>TELEPORT</td><td style='padding:6px 10px'>LASER</td><td style='padding:6px 10px'>CLOAKER</td></tr>
+<tr><th>Row 2</th><td style='padding:6px 10px'>TOXIC FART</td><td style='padding:6px 10px'>FREEZER</td><td style='padding:6px 10px'>FAKE</td><td style='padding:6px 10px'>BOOMERANG</td><td style='padding:6px 10px'>GHOST</td><td style='padding:6px 10px'>ANTS</td><td style='padding:6px 10px'>SUPERBRIDGE</td><td style='padding:6px 10px'>HOLDTROOPER</td></tr>
+<tr><th>Row 3</th><td style='padding:6px 10px'>STEAL</td><td style='padding:6px 10px'>VOODOO</td><td style='padding:6px 10px'>AIRSTRIKE</td><td style='padding:6px 10px'>MINIGUN</td><td style='padding:6px 10px'>ROLLING BOULDER</td><td style='padding:6px 10px'>SPEAR</td><td style='padding:6px 10px'>SHEEP</td><td style='padding:6px 10px'>SPREADFIRE GUN</td></tr>
+<tr><th>Row 4</th><td style='padding:6px 10px'>REDGUN</td><td style='padding:6px 10px'>MISSLE TOWER</td><td style='padding:6px 10px'>HOMING MISSLE</td><td style='padding:6px 10px'>MEGA JUMP</td><td style='padding:6px 10px'>—</td><td style='padding:6px 10px'>—</td><td style='padding:6px 10px'>—</td><td style='padding:6px 10px'>—</td></tr>
+</table>
+
+<h2>Usage</h2>
+<pre style="background:#222;padding:12px;border-radius:4px">
+// Get a weapon sprite from the sheet:
+// ctx.drawImage(spriteSheet, srcX, srcY, 8, 8, destX, destY, destW, destH)
+
+// Example: draw SHOTGUN (index 0, col 0, row 0) scaled 4x:
+ctx.drawImage(spriteSheet, 0, 0, 8, 8, x, y, 32, 32);
+
+// Example: draw VOODOO (index 25, col 1, row 3) scaled 4x:
+ctx.drawImage(spriteSheet, 8, 24, 8, 8, x, y, 32, 32);
+</pre>
+
+</body></html>
